@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+
+   <meta charset="utf-8" />
+   <meta name="viewport" content="width=device-width, initial-scale=1" />
+   <meta name="apple-mobile-web-app-capable" content="yes" />
+   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+
+   <title>Volta</title>
+
+   <link rel="stylesheet" href="jquery.mobile-1.2.0.min.css" />
+   <link rel="stylesheet" href="Ngy.css" />
+   <link rel="stylesheet" href="jquery.jqplot.min.css" />
+
+   <script src="jquery-1.7.2.min.js"></script>
+   <script src="jquery.mobile-1.2.0.min.js"></script>
+
+   <script src="jquery.jqplot.min.js"></script>
+   <!-- script src="jqplot.barRenderer.min.js"></script>
+   <script src="jqplot.categoryAxisRenderer.min.js"></script -->
+
+   <script src="json2.js"></script> <!-- needed for jstorage -->
+   <script src="jstorage.js"></script> <!-- must be placed after jquery -->
+
+</head>
+<body>
+
+<!-- enter energy counter -->
+<div data-role="page" id="enter_energy_counter">
+   <div data-theme="a" data-role="header">
+      <span class="ui-title">Volta</span>
+   </div>
+   <div data-role="content">
+      <h2>Zählerstand erfassen</h2>
+      <div data-role="fieldcontain">
+         <fieldset data-role="controlgroup">
+            <label for="date">Datum</label>
+            <input name="date" id="date" placeholder="" value="" type="date" />
+         </fieldset>
+      </div>
+      <div data-role="fieldcontain">
+         <fieldset data-role="controlgroup">
+            <label for="time">Uhrzeit</label>
+            <input name="time" id="time" placeholder="" value="" type="time" />
+         </fieldset>
+      </div>
+      <div data-role="fieldcontain">
+         <fieldset data-role="controlgroup">
+            <label for="energy_counter">Zählerstand</label>
+            <input name="energy_counter" id="energy_counter" placeholder="" value="" type="number" />
+         </fieldset>
+      </div>
+      <div data-role="navbar" data-iconpos="top">
+         <ul>
+            <li><a href="#consumption" data-transition="fade" data-theme="" data-icon="forward">Speichern</a></li>
+            <li><a href="#list" data-transition="fade" data-theme="" data-icon="forward">Übersicht</a></li>
+         </ul>
+      </div>
+   </div>
+</div>
+
+<!-- consumption -->
+<div data-role="page" id="consumption">
+   <div data-theme="a" data-role="header">
+      <span class="ui-title">Volta</span>
+   </div>
+   <div data-role="content">
+      <h2>Verbrauchsberechnung</h2>
+      <div class="ui-grid-a">
+         <div class="ui-block-a">Tag</div>
+         <div id="dayEstimation" class="ui-block-b">12,4 kWh</div>
+         <div class="ui-block-a">Monat</div>
+         <div id="monthEstimation" class="ui-block-b">350 kWh</div>
+         <div class="ui-block-a">Jahr</div>
+         <div id="yearEstimation" class="ui-block-b">4000 kWh</div>
+      </div>
+
+      <div data-role="navbar" data-iconpos="top">
+         <ul>
+            <li><a href="#enter_energy_counter" data-transition="fade" data-theme="" data-icon="back">Erfassung</a></li>
+            <li><a href="#list" data-transition="fade" data-theme="" data-icon="forward">Liste</a></li>
+         </ul>
+      </div>
+   </div>
+</div>
+
+<!-- list of all energy entries -->
+<div data-role="page" id="list">
+
+   <div data-theme="a" data-role="header">
+      <span class="ui-title">Volta</span>
+   </div>
+
+   <div data-role="content">
+      <h2>Übersicht</h2>
+      <ul id="entries" data-role="listview" data-divider-theme="b" data-inset="true" data-filter="true"></ul>
+   </div>
+
+   <div data-role="navbar" data-iconpos="top">
+      <ul>
+         <li><a href="#enter_energy_counter" data-transition="fade" data-theme="" data-icon="back">Erfassung</a></li>
+         <li><a href="#graph" data-transition="fade" data-theme="" data-icon="back">Grafik</a></li>
+      </ul>
+   </div>
+</div>
+
+<!-- show all values in a graph -->
+<div data-role="page" id="graph">
+
+   <div data-theme="a" data-role="header">
+      <span class="ui-title">Volta</span>
+   </div>
+
+   <div data-role="content">
+      <h2>Grafi</h2>
+      <div id="chart" style="height:400px; width:400px; "></div>
+   </div>
+
+   <div data-role="navbar" data-iconpos="top">
+      <ul>
+         <li><a href="#enter_energy_counter" data-transition="fade" data-theme="" data-icon="back">Erfassung</a></li>
+         <li><a href="#list" data-transition="fade" data-theme="" data-icon="back">Liste</a></li>
+      </ul>
+   </div>
+</div>
+
+
+<script src="Ngy.js"></script>
+
+</body>
+</html>
