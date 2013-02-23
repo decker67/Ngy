@@ -1,0 +1,4 @@
+Ngy
+===
+
+Zählerstandserfassung
