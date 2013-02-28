@@ -7,7 +7,7 @@
    <meta name="apple-mobile-web-app-capable" content="yes" />
    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
 
-   <title>Volta</title>
+   <title>Ngy</title>
 
    <link rel="stylesheet" href="jquery.mobile-1.2.0.min.css" />
    <link rel="stylesheet" href="Ngy.css" />
@@ -17,8 +17,11 @@
    <script src="jquery.mobile-1.2.0.min.js"></script>
 
    <script src="jquery.jqplot.min.js"></script>
-   <!-- script src="jqplot.barRenderer.min.js"></script>
-   <script src="jqplot.categoryAxisRenderer.min.js"></script -->
+   <script src="jqplot.barRenderer.min.js"></script>
+   <script src="jqplot.dateAxisRenderer.min.js"></script>
+   <script src="jqplot.highlighter.min.js"></script>
+   <script src="jqplot.canvasAxisTickRenderer.min.js"></script>
+   <script src="jqplot.canvasAxisLabelRenderer.min.js"></script>
 
    <script src="json2.js"></script> <!-- needed for jstorage -->
    <script src="jstorage.js"></script> <!-- must be placed after jquery -->
@@ -26,35 +29,38 @@
 </head>
 <body>
 
-<!-- enter energy counter -->
-<div data-role="page" id="enter_energy_counter">
+<!-- enter new energy counter -->
+<div data-role="page" id="enter_new_energy_counter">
+
    <div data-theme="a" data-role="header">
-      <span class="ui-title">Volta</span>
+      <span class="ui-title">Ngy</span>
    </div>
+
    <div data-role="content">
-      <h2>Zählerstand erfassen</h2>
+      <h2>Neuen Zählerstand erfassen</h2>
       <div data-role="fieldcontain">
          <fieldset data-role="controlgroup">
-            <label for="date">Datum</label>
-            <input name="date" id="date" placeholder="" value="" type="date" />
+            <label for="new_date">Datum</label>
+            <input name="new_date" id="new_date" placeholder="" value="" type="date" />
          </fieldset>
       </div>
       <div data-role="fieldcontain">
          <fieldset data-role="controlgroup">
-            <label for="time">Uhrzeit</label>
-            <input name="time" id="time" placeholder="" value="" type="time" />
+            <label for="new_time">Uhrzeit</label>
+            <input name="new_time" id="new_time" placeholder="" value="" type="time" />
          </fieldset>
       </div>
       <div data-role="fieldcontain">
          <fieldset data-role="controlgroup">
-            <label for="energy_counter">Zählerstand</label>
-            <input name="energy_counter" id="energy_counter" placeholder="" value="" type="number" />
+            <label for="new_energy_counter">Zählerstand</label>
+            <input name="new_energy_counter" id="new_energy_counter" placeholder="" value="" type="number" />
          </fieldset>
       </div>
+
       <div data-role="navbar" data-iconpos="top">
          <ul>
-            <li><a href="#consumption" data-transition="fade" data-theme="" data-icon="forward">Speichern</a></li>
-            <li><a href="#list" data-transition="fade" data-theme="" data-icon="forward">Übersicht</a></li>
+            <li><a id="save_new_entry" href="#consumption" data-transition="fade" data-theme="" data-icon="save" />Speichern</a></li>
+            <li><a href="#all_entries" data-transition="fade" data-theme="" data-icon="forward">Übersicht</a></li>
          </ul>
       </div>
    </div>
@@ -63,7 +69,7 @@
 <!-- consumption -->
 <div data-role="page" id="consumption">
    <div data-theme="a" data-role="header">
-      <span class="ui-title">Volta</span>
+      <span class="ui-title">Ngy</span>
    </div>
    <div data-role="content">
       <h2>Verbrauchsberechnung</h2>
@@ -78,30 +84,68 @@
 
       <div data-role="navbar" data-iconpos="top">
          <ul>
-            <li><a href="#enter_energy_counter" data-transition="fade" data-theme="" data-icon="back">Erfassung</a></li>
-            <li><a href="#list" data-transition="fade" data-theme="" data-icon="forward">Liste</a></li>
+            <li><a href="#enter_new_energy_counter" data-transition="fade" data-theme="" data-icon="back">Erfassung</a></li>
+            <li><a href="#all_entries" data-transition="fade" data-theme="" data-icon="forward">Übersicht</a></li>
          </ul>
       </div>
    </div>
 </div>
 
 <!-- list of all energy entries -->
-<div data-role="page" id="list">
+<div data-role="page" id="all_entries">
 
    <div data-theme="a" data-role="header">
-      <span class="ui-title">Volta</span>
+      <span class="ui-title">Ngy</span>
    </div>
 
    <div data-role="content">
-      <h2>Übersicht</h2>
+      <h2>Zählerstände</h2>
       <ul id="entries" data-role="listview" data-divider-theme="b" data-inset="true" data-filter="true"></ul>
    </div>
 
    <div data-role="navbar" data-iconpos="top">
       <ul>
-         <li><a href="#enter_energy_counter" data-transition="fade" data-theme="" data-icon="back">Erfassung</a></li>
+         <li><a href="#enter_new_energy_counter" data-transition="fade" data-theme="" data-icon="back">Erfassung</a></li>
          <li><a href="#graph" data-transition="fade" data-theme="" data-icon="back">Grafik</a></li>
       </ul>
+   </div>
+</div>
+
+<!-- page phone_entry -->
+<div data-role="page" id="edit_entry">
+
+   <div data-theme="a" data-role="header">
+      <span class="ui-title">Ngy</span>
+   </div>
+
+   <div data-role="content">
+      <h2>Zählerstand bearbeiten</h2>
+      <div data-role="fieldcontain">
+         <fieldset data-role="controlgroup">
+            <label for="entry_date">Datum</label>
+            <input name="entry_date" id="entry_date" placeholder="" value="" type="date" />
+         </fieldset>
+      </div>
+      <div data-role="fieldcontain">
+         <fieldset data-role="controlgroup">
+            <label for="entry_time">Uhrzeit</label>
+            <input name="entry_time" id="entry_time" placeholder="" value="" type="time" />
+         </fieldset>
+      </div>
+      <div data-role="fieldcontain">
+         <fieldset data-role="controlgroup">
+            <label for="entry_energy_counter">Zählerstand</label>
+            <input name="entry_energy_counter" id="entry_energy_counter" placeholder="" value="" type="number" />
+         </fieldset>
+      </div>
+
+      <div data-role="navbar" data-iconpos="top">
+         <ul>
+            <li><a href="#all_entries" id="save_entry" data-transition="fade" data-theme="" data-icon="save">Speichern</a></li>
+            <li><a href="#all_entries" id="delete_entry" data-transition="fade" data-theme="" data-icon="delete">Löschen</a></li>
+            <li><a href="#all_entries" data-transition="fade" data-theme="" data-icon="back">Übersicht</a></li>
+         </ul>
+      </div>
    </div>
 </div>
 
@@ -109,18 +153,18 @@
 <div data-role="page" id="graph">
 
    <div data-theme="a" data-role="header">
-      <span class="ui-title">Volta</span>
+      <span class="ui-title">Ngy</span>
    </div>
 
    <div data-role="content">
-      <h2>Grafi</h2>
-      <div id="chart" style="height:400px; width:400px; "></div>
+      <h2>Grafik</h2>
+      <div id="chart" style="height:400px; width:400px"></div>
    </div>
 
    <div data-role="navbar" data-iconpos="top">
       <ul>
-         <li><a href="#enter_energy_counter" data-transition="fade" data-theme="" data-icon="back">Erfassung</a></li>
-         <li><a href="#list" data-transition="fade" data-theme="" data-icon="back">Liste</a></li>
+         <li><a href="#enter_new_energy_counter" data-transition="fade" data-theme="" data-icon="back">Neu</a></li>
+         <li><a href="#all_entries" data-transition="fade" data-theme="" data-icon="back">Übersicht</a></li>
       </ul>
    </div>
 </div>

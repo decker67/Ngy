@@ -6,9 +6,9 @@
 
     "use strict";
 
-    var KWH = ' kWh';
-
-    var energyValues = [];
+    var KWH = ' kWh',
+        energyValues = [],
+        selectedEntryId = null;
 
     //-----------------------------------------------------------------------------------------------------------
 
@@ -29,36 +29,121 @@
     //-----------------------------------------------------------------------------------------------------------
 
     function getTimeAsISOString( date ) {
-        var hours = addZero( date.getHours()), // - date.getTimezoneOffset() / 60 ),
-            minutes = addZero( date.getMinutes() + 1 ),
+        var hours = addZero( date.getHours() ), // - date.getTimezoneOffset() / 60 ),
+            minutes = addZero( date.getMinutes() ),
             seconds = addZero( date.getSeconds() );
         return hours + ':' + minutes + ':' + seconds;
     }
 
     //-----------------------------------------------------------------------------------------------------------
 
-    function areAtLeastTwoEnergyValuesAvailable() {
-      return energyValues.length >= 2;
+    function deleteEntry( id  ) {
+        energyValues.splice( selectedEntryId, 1 );
+        recalculateConsumptions( id );
+        saveEntriesToStore( )
+    }
+
+    //-----------------------------------------------------------------------------------------------------------
+
+    function saveEntry( dateId, timeId, energy_counterId, entryId ) {
+        var date = new Date( $( dateId ).val() + 'T' + $( timeId ).val()),
+            energy_counter = parseInt( $( energy_counterId ).val(), 10 ),
+            newValue = {
+                'date': date,
+                'energy_counter': energy_counter,
+                'consumption': {
+                    'day': 0,
+                    'month': 0,
+                    'year': 0
+                }
+            };
+
+        //NEEDS FIX B: does not work in different timezone
+        date.setHours( date.getHours() - 1 );
+        if( entryId !== undefined && entryId !== null ) { //update of existing value
+          energyValues[ entryId ] = newValue;
+        } else {
+           energyValues.push( newValue );
+        }
+        energyValues.sort( function( operand1, operand2 ) { return operand1.date - operand2.date; } );
+        recalculateConsumptions( energyValues.indexOf( newValue ) );
+        saveEntriesToStore( energyValues );
+    }
+
+    //-----------------------------------------------------------------------------------------------------------
+
+    function recalculateConsumptions( fromId ) {
+        var i = -1,
+            previousValue = null;
+
+       if( fromId < 0 || fromId >= energyValues.length || energyValues.length === 0 ) {
+           return;
+       }
+
+       for( i = fromId; i < energyValues.length; ++i ) {
+         if( i === 0 ) {
+            energyValues[ i ].consumption =  {
+               'day': 0,
+               'month': 0,
+               'year': 0
+            };
+         } else {
+            previousValue = energyValues[ i - 1 ];
+            energyValues[ i ].consumption = calculateConsumption( previousValue, energyValues[ i ] );
+         }
+       }
+    }
+
+    //-----------------------------------------------------------------------------------------------------------
+
+    function getPreviousValue( newValue ) {
+        var i = -1,
+            found = false;
+        if( energyValues.length === 0 ) {
+           return null;
+        }
+        for( i = energyValues.length - 1; i >= 0; --i ) {
+            if( energyValues[ i ].date < newValue.date ) {
+               found = true;
+               break;
+            }
+        }
+        if( found ) {
+           return energyValues[ i ];
+        }
+        return null;
     }
 
     //-----------------------------------------------------------------------------------------------------------
 
     function calculateConsumption( from, to ) {
-        var fromTimestamp = Date.parse( from.date + 'T' + from.time ),
-            toTimestamp = Date.parse( to.date + 'T' + to.time );
-        var delta_counter = ( to.energy_counter - from.energy_counter )
-            / ( toTimestamp - fromTimestamp )
+        var EMPTY_CONSUMPTION = {
+                'day': 0,
+                'month': 0,
+                'year': 0
+            },
+            fromTimestamp = null,
+            toTimestamp = null,
+            delta_counter = null,
+            consumption = EMPTY_CONSUMPTION;
+
+        if( from === null || to === null || to.energy_counter <= from.energy_counter ) {
+           return consumption;
+        }
+
+        delta_counter = ( to.energy_counter - from.energy_counter )
+            / ( to.date - from.date )
             * 1000 * 60 * 60 * 24;
-        return {
-            'day':   delta_counter,
-            'month': delta_counter * 30,
-            'year':  delta_counter * 365
-        };
+        consumption.day = Math.floor( delta_counter );
+        consumption.month = Math.floor( delta_counter * 30 );
+        consumption.year = Math.floor( delta_counter * 365 );
+        return consumption;
     }
 
     //-----------------------------------------------------------------------------------------------------------
 
     function removeAllEntries( ulElement ) {
+        ulElement.children().off( 'click' );
         ulElement.empty();
     }
 
@@ -70,85 +155,169 @@
 
         for( i = list.length - 1; i >= 0; --i ) {
             listItem = '<li data-entry-id="' + i +
-                '" data-theme="c"><a href="#entry" data-transition="slide">' +
-                list[ i ].date + ' ' + list[ i ].time + ': ' + list[ i ].energy_counter + '</a></li>';
+                '" data-theme="c"><a href="#edit_entry" data-transition="slide">' +
+                getDateAsISOString( list[ i ].date ) + ' ' + getTimeAsISOString( list[ i ].date ) + ': ' + list[ i ].energy_counter + '</a></li>';
             ulElement.append( listItem );
         }
+        //handle selection of entry in
+        ulElement.children().on( 'click', function( event ) {
+            event.stopPropagation();
+            selectedEntryId = parseInt( event.currentTarget.getAttribute( 'data-entry-id' ), 10 ) ;
+            console.log( 'selectedEntry:' + selectedEntryId );
+        });
+
     }
 
     //-----------------------------------------------------------------------------------------------------------
 
-    function saveEnergyCounter( date, time, energy_counter ) {
-        energyValues.push( {
-            'date': date,
-            'time': time,
-            'energy_counter': energy_counter
-        } );
-        console.log( energyValues );
-        //should sort the array
+    function saveEntriesToStore( energyValues ) {
         $.jStorage.set( 'energyValues', energyValues );
+    }
+
+    //-----------------------------------------------------------------------------------------------------------
+
+    function readEntriesFromStorage() {
+        var entriesFromStorage = $.jStorage.get( 'energyValues' ) || [],
+            i = -1;
+        for( i = 0; i < entriesFromStorage.length; ++i ) {
+            entriesFromStorage[ i ].date = new Date( entriesFromStorage[ i ].date );
+        }
+        return entriesFromStorage;
     }
 
     //-----------------------------------------------------------------------------------------------------------
     // main
     //-----------------------------------------------------------------------------------------------------------
 
-    $( '#save' ).bind( 'click', function saveClicked( event, ui ) {
-        var date = $( '#date' ).val();
-        var time = $( '#time' ).val();
-        var energy_counter = $( '#energy_counter' ).val();
+    $( '#save_new_entry' ).bind( 'click', function saveClicked( event, ui ) {
+       saveEntry( '#new_date', '#new_time', '#new_energy_counter' );
 
-        saveEnergyCounter( date, time, energy_counter );
-
-        if( areAtLeastTwoEnergyValuesAvailable() ) {
-           $.mobile.changePage( '#consumption', {
-               transition: 'fade',
-               reverse: false,
-               changeHash: false
-           });
-        }
+       $.mobile.changePage( '#consumption', {
+           transition: 'fade',
+           reverse: false,
+           changeHash: false
+       } );
     } );
 
     // read all saved counters from local storage
-    $( '#enter_energy_counter' ).live( 'pagebeforecreate', function() {
-       energyValues = $.jStorage.get( 'energyValues' ) || [];
+    $( '#enter_new_energy_counter' ).live( 'pagebeforecreate', function() {
+       energyValues = readEntriesFromStorage();
        var now = new Date(),
            dateAsString = getDateAsISOString( now ),
            timeAsString = getTimeAsISOString( now );
-       $( '#time' ).val( timeAsString );
-       $( '#date').val( dateAsString );
+       $( '#new_time' ).val( timeAsString );
+       $( '#new_date').val( dateAsString );
+      //NEEDS FIX A: check if inputs are valid and show pop up if not
        if( energyValues.length > 0 ) {
           var lastEnergyValue = energyValues[ energyValues.length - 1 ];
-          $( '#energy_counter' ).val( lastEnergyValue.energy_counter );
+          $( '#new_energy_counter' ).val( lastEnergyValue.energy_counter );
        } else {
-          $( '#energy_counter' ).val( 0 );
+          $( '#new_energy_counter' ).val( 0 );
        }
     } );
 
     // calculate consumption using the last two energy values
     $( '#consumption' ).live( 'pagebeforeshow', function() {
-        var fromPosition = energyValues.length - 2;
-        var toPosition = energyValues.length - 1;
-        var consumption = calculateConsumption( energyValues[ toPosition ], energyValues [ fromPosition ] );
+        var consumption = energyValues[ energyValues.length - 1 ].consumption;
 
         $( '#dayEstimation').html( consumption.day + KWH );
         $( '#monthEstimation').html( consumption.month + KWH );
         $( '#yearEstimation').html( consumption.year + KWH );
     } );
 
-    // calculate consumption using the last two energy values
-    $( '#list' ).live( 'pagebeforeshow', function() {
+    // show all energy values in a list
+    $( '#all_entries' ).live( 'pagebeforeshow', function() {
         var ulElement = $( '#entries' );
         removeAllEntries( ulElement );
         addAllEntries( ulElement, energyValues );
         ulElement.listview( 'refresh' );
     } );
 
-    // show chart with all values
-    $( '#graph' ).live( 'pagebeforeshow', function() {
-        $.jqplot( 'chart',  [[[1, 2],[3,5.12],[5,13.1],[7,33.6],[9,85.9],[11,219.9]]]);
+    $( '#edit_entry' ).live( "pagebeforeshow", function() {
+        if( selectedEntryId !== null ) {
+            var entry = energyValues[ selectedEntryId ];
+            console.log( entry );
+            $( '#entry_date' ).val( getDateAsISOString( entry.date ) );
+            $( '#entry_time' ).val( getTimeAsISOString( entry.date ) );
+            $( '#entry_energy_counter' ).val( entry.energy_counter );
+        } else {
+            $.mobile.changePage( '#list' );
+        }
     } );
 
+    // show chart with all values
+    $( '#graph' ).live( 'pageshow', function() {
+        var chartValues = [],
+            i = null,
+            value = null,
+            yMin = Number.MAX_VALUE,
+            yMax = Number.MIN_VALUE,
+            xMin = null,
+            xMax = null;
+
+        if( energyValues.length === 0 ) {
+           //NEEDS FIX B: show empty chart
+           return;
+        }
+
+        xMin = energyValues[ 0 ].date,
+        xMax = energyValues[ energyValues.length - 1 ].date;
+
+        for( i = 0; i < energyValues.length; ++i ) {
+          value = energyValues[ i ].energy_counter;
+          yMin = Math.min( value, yMin );
+          yMax = Math.max( value, yMax );
+          chartValues.push( [ energyValues[ i ].date, value ] );
+        }
+
+        //NEEDS FIX B: show no decimals on y axis
+        $.jqplot( 'chart',  [ chartValues ],
+           { title:'Verbrauchsverlauf',
+             series:[ {color:'red'} ],
+               highlighter: {
+                   show: true,
+                   sizeAdjust: 7.5
+               },
+               cursor: {
+                   show: false
+               },
+               axes:{
+                 xaxis: {
+                     label: 'Tag',
+                     min: xMin,
+                     max: xMax,
+                     renderer: $.jqplot.DateAxisRenderer,
+                     tickOptions:{
+                         formatString:'%b&nbsp;%#d'
+                     }/*,
+                     labelRenderer: $.jqplot.CanvasAxisLabelRenderer*/
+                 },
+                 yaxis:{
+                     label:'Zählerstand',
+                     min: yMin,
+                     max: yMax/*,
+                     labelRenderer: $.jqplot.CanvasAxisLabelRenderer*/
+                 }
+             }/*,
+             axesDefaults: {
+                tickRenderer: $.jqplot.CanvasAxisTickRenderer,
+                tickOptions: {
+                    angle: -90
+                }
+             }*/
+           } );
+    } );
+
+    //handle deletion of entry
+    $( '#delete_entry' ).delegate( '', 'click', function( event ) {
+        event.stopPropagation();
+        deleteEntry( selectedEntryId );
+    });
+    //handle save of entry
+    $( '#save_entry' ).delegate( '', 'click', function( event ) {
+        event.stopPropagation();
+        saveEntry( '#entry_date', '#entry_time', '#entry_energy_counter', selectedEntryId );
+    });
 
 
 
