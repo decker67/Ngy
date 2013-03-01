@@ -163,7 +163,7 @@
         ulElement.children().on( 'click', function( event ) {
             event.stopPropagation();
             selectedEntryId = parseInt( event.currentTarget.getAttribute( 'data-entry-id' ), 10 ) ;
-            console.log( 'selectedEntry:' + selectedEntryId );
+            //console.log( 'selectedEntry:' + selectedEntryId );
         });
 
     }
@@ -236,7 +236,7 @@
     $( '#edit_entry' ).live( "pagebeforeshow", function() {
         if( selectedEntryId !== null ) {
             var entry = energyValues[ selectedEntryId ];
-            console.log( entry );
+            //console.log( entry );
             $( '#entry_date' ).val( getDateAsISOString( entry.date ) );
             $( '#entry_time' ).val( getTimeAsISOString( entry.date ) );
             $( '#entry_energy_counter' ).val( entry.energy_counter );
@@ -247,13 +247,18 @@
 
     // show chart with all values
     $( '#graph' ).live( 'pageshow', function() {
-        var chartValues = [],
+        var chartCounterValues = [],
+            chartConsumptionDayValues = [],
+            chartConsumptionMonthValues = [],
+            chartConsumptionYearValues = [],
             i = null,
             value = null,
             yMin = Number.MAX_VALUE,
             yMax = Number.MIN_VALUE,
             xMin = null,
-            xMax = null;
+            xMax = null,
+            date =  null;
+            date =  null;
 
         if( energyValues.length === 0 ) {
            //NEEDS FIX B: show empty chart
@@ -267,11 +272,18 @@
           value = energyValues[ i ].energy_counter;
           yMin = Math.min( value, yMin );
           yMax = Math.max( value, yMax );
-          chartValues.push( [ energyValues[ i ].date, value ] );
+          date = energyValues[ i ].date;
+          chartCounterValues.push( [ date, value ] );
+          chartConsumptionDayValues.push( [ date, energyValues[ i ].consumption.day ] );
+          chartConsumptionMonthValues.push( [ date, energyValues[ i ].consumption.month ] );
+          chartConsumptionYearValues.push( [ date, energyValues[ i ].consumption.year ] );
         }
 
         //NEEDS FIX B: show no decimals on y axis
-        $.jqplot( 'chart',  [ chartValues ],
+        $.jqplot( 'chart',  [ chartCounterValues,
+                              chartConsumptionDayValues,
+                              chartConsumptionMonthValues,
+                              chartConsumptionYearValues ],
            { title:'Verbrauchsverlauf',
              series:[ {color:'red'} ],
                highlighter: {
