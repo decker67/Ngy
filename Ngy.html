@@ -9,19 +9,20 @@
 
    <title>Ngy</title>
 
-   <link rel="stylesheet" href="jquery.mobile-1.2.0.min.css" />
+   <link rel="stylesheet" href="jquery.mobile-1.3.0.min.css" />
    <link rel="stylesheet" href="Ngy.css" />
    <link rel="stylesheet" href="jquery.jqplot.min.css" />
 
+
    <script src="jquery-1.7.2.min.js"></script>
-   <script src="jquery.mobile-1.2.0.min.js"></script>
+   <script src="jquery.mobile-1.3.0.min.js"></script>
 
    <script src="jquery.jqplot.min.js"></script>
    <script src="jqplot.barRenderer.min.js"></script>
    <script src="jqplot.dateAxisRenderer.min.js"></script>
    <script src="jqplot.highlighter.min.js"></script>
    <script src="jqplot.canvasAxisTickRenderer.min.js"></script>
-   <script src="jqplot.canvasAxisLabelRenderer.min.js"></script>
+   <!-- script src="jqplot.canvasAxisLabelRenderer.min.js"></script -->
 
    <script src="json2.js"></script> <!-- needed for jstorage -->
    <script src="jstorage.js"></script> <!-- must be placed after jquery -->
@@ -60,7 +61,7 @@
       <div data-role="navbar" data-iconpos="top">
          <ul>
             <li><a id="save_new_entry" href="#consumption" data-transition="fade" data-theme="" data-icon="save" />Speichern</a></li>
-            <li><a href="#all_entries" data-transition="fade" data-theme="" data-icon="forward">Übersicht</a></li>
+            <li><a href="#all_entries" data-transition="fade" data-theme="" data-icon="bar">Übersicht</a></li>
          </ul>
       </div>
    </div>
@@ -84,8 +85,8 @@
 
       <div data-role="navbar" data-iconpos="top">
          <ul>
-            <li><a href="#enter_new_energy_counter" data-transition="fade" data-theme="" data-icon="back">Erfassung</a></li>
-            <li><a href="#all_entries" data-transition="fade" data-theme="" data-icon="forward">Übersicht</a></li>
+            <li><a href="#enter_new_energy_counter" data-transition="fade" data-theme="" data-icon="plus">Neu</a></li>
+            <li><a href="#all_entries" data-transition="fade" data-theme="" data-icon="bar">Übersicht</a></li>
          </ul>
       </div>
    </div>
@@ -105,8 +106,8 @@
 
    <div data-role="navbar" data-iconpos="top">
       <ul>
-         <li><a href="#enter_new_energy_counter" data-transition="fade" data-theme="" data-icon="back">Erfassung</a></li>
-         <li><a href="#graph" data-transition="fade" data-theme="" data-icon="back">Grafik</a></li>
+         <li><a href="#enter_new_energy_counter" data-transition="fade" data-theme="" data-icon="plus">Neu</a></li>
+         <li><a href="#graph" data-transition="fade" data-theme="" data-icon="grid">Grafik</a></li>
       </ul>
    </div>
 </div>
@@ -143,7 +144,7 @@
          <ul>
             <li><a href="#all_entries" id="save_entry" data-transition="fade" data-theme="" data-icon="save">Speichern</a></li>
             <li><a href="#all_entries" id="delete_entry" data-transition="fade" data-theme="" data-icon="delete">Löschen</a></li>
-            <li><a href="#all_entries" data-transition="fade" data-theme="" data-icon="back">Übersicht</a></li>
+            <li><a href="#all_entries" data-transition="fade" data-theme="" data-icon="bar">Übersicht</a></li>
          </ul>
       </div>
    </div>
@@ -158,13 +159,13 @@
 
    <div data-role="content">
       <h2>Grafik</h2>
-      <div id="chart" style="height:400px; width:400px"></div>
+      <div id="chart" style="height:400px; width:800px"></div>
    </div>
 
    <div data-role="navbar" data-iconpos="top">
       <ul>
-         <li><a href="#enter_new_energy_counter" data-transition="fade" data-theme="" data-icon="back">Neu</a></li>
-         <li><a href="#all_entries" data-transition="fade" data-theme="" data-icon="back">Übersicht</a></li>
+         <li><a href="#enter_new_energy_counter" data-transition="fade" data-theme="" data-icon="plus">Neu</a></li>
+         <li><a href="#all_entries" data-transition="fade" data-theme="" data-icon="bar">Übersicht</a></li>
       </ul>
    </div>
 </div>

@@ -19,6 +19,19 @@
 
     //-----------------------------------------------------------------------------------------------------------
 
+    function createLocalDate( date, time ) {
+       var dateComponents = date.split( '-' );
+       var timeComponents = time.split( ':' );
+       return new Date( parseInt( dateComponents[ 0 ], 10),
+                        parseInt( dateComponents[ 1 ], 10 ) - 1,
+                        parseInt( dateComponents[ 2 ], 10 ),
+                        parseInt( timeComponents[ 0 ], 10 ),
+                        parseInt( timeComponents[ 1 ], 10 ),
+                        parseInt( timeComponents[ 2 ], 10 ), 0 );
+    }
+
+   //-----------------------------------------------------------------------------------------------------------
+
     function getDateAsISOString( date ) {
         var day = addZero( date.getDate() ),
             month = addZero( date.getMonth() + 1 ),
@@ -46,7 +59,7 @@
     //-----------------------------------------------------------------------------------------------------------
 
     function saveEntry( dateId, timeId, energy_counterId, entryId ) {
-        var date = new Date( $( dateId ).val() + 'T' + $( timeId ).val()),
+        var date = createLocalDate( $( dateId ).val(), $( timeId ).val()),
             energy_counter = parseInt( $( energy_counterId ).val(), 10 ),
             newValue = {
                 'date': date,
@@ -58,8 +71,7 @@
                 }
             };
 
-        //NEEDS FIX B: does not work in different timezone
-        date.setHours( date.getHours() - 1 );
+        //NEEDS FIX B: check for already given value at the same time, simply overwrite it
         if( entryId !== undefined && entryId !== null ) { //update of existing value
           energyValues[ entryId ] = newValue;
         } else {
@@ -155,8 +167,11 @@
 
         for( i = list.length - 1; i >= 0; --i ) {
             listItem = '<li data-entry-id="' + i +
-                '" data-theme="c"><a href="#edit_entry" data-transition="slide">' +
-                getDateAsISOString( list[ i ].date ) + ' ' + getTimeAsISOString( list[ i ].date ) + ': ' + list[ i ].energy_counter + '</a></li>';
+               '" data-theme="c"><a href="#edit_entry" data-transition="slide">' +
+               list[ i ].date.toLocaleString() + ': ' + list[ i ].energy_counter + ' (' +
+               list[ i ].consumption.day + '/' + list[ i ].consumption.month + '/' +
+               list[ i ].consumption.year + ')' +
+               '</a></li>';
             ulElement.append( listItem );
         }
         //handle selection of entry in
@@ -190,6 +205,8 @@
     //-----------------------------------------------------------------------------------------------------------
 
     $( '#save_new_entry' ).bind( 'click', function saveClicked( event, ui ) {
+
+       // NEEDS FIX B: check for negative values and reject those
        saveEntry( '#new_date', '#new_time', '#new_energy_counter' );
 
        $.mobile.changePage( '#consumption', {
@@ -269,55 +286,82 @@
         xMax = energyValues[ energyValues.length - 1 ].date;
 
         for( i = 0; i < energyValues.length; ++i ) {
-          value = energyValues[ i ].energy_counter;
-          yMin = Math.min( value, yMin );
-          yMax = Math.max( value, yMax );
-          date = energyValues[ i ].date;
-          chartCounterValues.push( [ date, value ] );
-          chartConsumptionDayValues.push( [ date, energyValues[ i ].consumption.day ] );
-          chartConsumptionMonthValues.push( [ date, energyValues[ i ].consumption.month ] );
-          chartConsumptionYearValues.push( [ date, energyValues[ i ].consumption.year ] );
+           value = energyValues[ i ].energy_counter;
+           yMin = Math.min( value, yMin );
+           yMax = Math.max( value, yMax );
+           date = energyValues[ i ].date;
+           chartCounterValues.push( [ date, value ] );
+           if( i !== 0) {
+              chartConsumptionDayValues.push( [ date, energyValues[ i ].consumption.day ] );
+              chartConsumptionMonthValues.push( [ date, energyValues[ i ].consumption.month ] );
+              chartConsumptionYearValues.push( [ date, energyValues[ i ].consumption.year ] );
+           }
         }
-
         //NEEDS FIX B: show no decimals on y axis
+        $('#chart').empty();
         $.jqplot( 'chart',  [ chartCounterValues,
                               chartConsumptionDayValues,
                               chartConsumptionMonthValues,
                               chartConsumptionYearValues ],
            { title:'Verbrauchsverlauf',
-             series:[ {color:'red'} ],
-               highlighter: {
-                   show: true,
-                   sizeAdjust: 7.5
-               },
-               cursor: {
-                   show: false
-               },
-               axes:{
-                 xaxis: {
-                     label: 'Tag',
-                     min: xMin,
-                     max: xMax,
-                     renderer: $.jqplot.DateAxisRenderer,
-                     tickOptions:{
-                         formatString:'%b&nbsp;%#d'
-                     }/*,
-                     labelRenderer: $.jqplot.CanvasAxisLabelRenderer*/
-                 },
-                 yaxis:{
-                     label:'Zählerstand',
-                     min: yMin,
-                     max: yMax/*,
-                     labelRenderer: $.jqplot.CanvasAxisLabelRenderer*/
-                 }
-             }/*,
+             series: [
+                {
+                   label: 'Zähler',
+                   color: 'green'
+                },
+                {
+                   label: 'pro Tag',
+                   yaxis: 'y2axis',
+                   color: 'yellow'
+                },
+                {
+                   label: 'pro Monat',
+                   yaxis: 'y2axis',
+                   color: 'orange'
+                },
+                {
+                   label: 'pro Jahr',
+                   yaxis: 'y2axis',
+                   color: 'red'
+                }
+             ],
+             legend: {show: true,placement: 'outsideGrid'},
+             highlighter: {
+                show: true,
+                sizeAdjust: 7.5
+             },
+             cursor: {
+                show: false
+             },
+             axes:{
+                xaxis: {
+                   label: 'Tag',
+                   min: xMin,
+                   max: xMax,
+                   renderer: $.jqplot.DateAxisRenderer,
+                   tickOptions:{
+                   formatString:'%b&nbsp;%#d'/*,
+                   labelRenderer: $.jqplot.CanvasAxisLabelRenderer*/
+                }
+             },
+             yaxis:{
+                label:'Zählerstand',
+                min: yMin,
+                max: yMax/*,
+                labelRenderer: $.jqplot.CanvasAxisLabelRenderer*/
+             },
+             y2axis:{
+                label:'Verbrauchsabschätzung'
+
+             }
+           }/*,
              axesDefaults: {
                 tickRenderer: $.jqplot.CanvasAxisTickRenderer,
                 tickOptions: {
                     angle: -90
                 }
              }*/
-           } );
+        } );
     } );
 
     //handle deletion of entry
