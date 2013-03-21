@@ -345,13 +345,13 @@
                 }
              },
              yaxis:{
-                label:'Zählerstand',
+                //label:'Zählerstand',
                 min: yMin,
                 max: yMax/*,
                 labelRenderer: $.jqplot.CanvasAxisLabelRenderer*/
              },
              y2axis:{
-                label:'Verbrauchsabschätzung'
+                //label:'Verbrauchsabschätzung'
 
              }
            }/*,
