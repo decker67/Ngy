@@ -27,7 +27,7 @@
                         parseInt( dateComponents[ 2 ], 10 ),
                         parseInt( timeComponents[ 0 ], 10 ),
                         parseInt( timeComponents[ 1 ], 10 ),
-                        parseInt( timeComponents[ 2 ], 10 ), 0 );
+                        0, 0 );
     }
 
    //-----------------------------------------------------------------------------------------------------------
@@ -52,7 +52,7 @@
 
     function deleteEntry( id  ) {
         energyValues.splice( selectedEntryId, 1 );
-        recalculateConsumptions( id );
+        //recalculateConsumptions( id );
         saveEntriesToStore( )
     }
 
@@ -78,31 +78,28 @@
            energyValues.push( newValue );
         }
         energyValues.sort( function( operand1, operand2 ) { return operand1.date - operand2.date; } );
-        recalculateConsumptions( energyValues.indexOf( newValue ) );
+        //recalculateConsumptions( energyValues.indexOf( newValue ) );
+        if( entryId === 0 ) {
+           calculateConsumptions();
+        } else {
+           newValue.consumption = calculateConsumption( energyValues[ 0 ], newValue );
+        }
         saveEntriesToStore( energyValues );
     }
 
     //-----------------------------------------------------------------------------------------------------------
 
-    function recalculateConsumptions( fromId ) {
+    function recalculateConsumptions() {
         var i = -1,
-            previousValue = null;
+            fromId = 1,
+            firstValue = null;
 
        if( fromId < 0 || fromId >= energyValues.length || energyValues.length === 0 ) {
            return;
        }
-
+       firstValue = energyValues[ 0 ];
        for( i = fromId; i < energyValues.length; ++i ) {
-         if( i === 0 ) {
-            energyValues[ i ].consumption =  {
-               'day': 0,
-               'month': 0,
-               'year': 0
-            };
-         } else {
-            previousValue = energyValues[ i - 1 ];
-            energyValues[ i ].consumption = calculateConsumption( previousValue, energyValues[ i ] );
-         }
+          energyValues[ i ].consumption = calculateConsumption( firstValue, energyValues[ i ] );
        }
     }
 
