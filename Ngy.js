@@ -52,7 +52,7 @@
 
     function deleteEntry( id  ) {
         energyValues.splice( selectedEntryId, 1 );
-        //recalculateConsumptions( id );
+        recalculateConsumptions( id );
         saveEntriesToStore( )
     }
 
@@ -78,12 +78,7 @@
            energyValues.push( newValue );
         }
         energyValues.sort( function( operand1, operand2 ) { return operand1.date - operand2.date; } );
-        //recalculateConsumptions( energyValues.indexOf( newValue ) );
-        if( entryId === 0 ) {
-           calculateConsumptions();
-        } else {
-           newValue.consumption = calculateConsumption( energyValues[ 0 ], newValue );
-        }
+        recalculateConsumptions();
         saveEntriesToStore( energyValues );
     }
 
@@ -91,13 +86,8 @@
 
     function recalculateConsumptions() {
         var i = -1,
-            fromId = 1,
-            firstValue = null;
-
-       if( fromId < 0 || fromId >= energyValues.length || energyValues.length === 0 ) {
-           return;
-       }
-       firstValue = energyValues[ 0 ];
+            fromId = 0,
+            firstValue = energyValues[ 0 ];
        for( i = fromId; i < energyValues.length; ++i ) {
           energyValues[ i ].consumption = calculateConsumption( firstValue, energyValues[ i ] );
        }
