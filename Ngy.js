@@ -290,7 +290,7 @@
                               chartConsumptionDayValues,
                               chartConsumptionMonthValues,
                               chartConsumptionYearValues ],
-           { title:'Verbrauchsverlauf',
+           { //title:'Verbrauchsverlauf',
              series: [
                 {
                    label: 'Zähler',
@@ -327,27 +327,27 @@
                    max: xMax,
                    renderer: $.jqplot.DateAxisRenderer,
                    tickOptions:{
-                   formatString:'%b&nbsp;%#d'/*,
-                   labelRenderer: $.jqplot.CanvasAxisLabelRenderer*/
-                }
+                      formatString:'%d.%m',
+                      angle: -90
+                   }
              },
              yaxis:{
-                //label:'Zählerstand',
+                label:'Zählerstand',
+                labelRenderer: $.jqplot.CanvasAxisLabelRenderer,
                 min: yMin,
-                max: yMax/*,
-                labelRenderer: $.jqplot.CanvasAxisLabelRenderer*/
+                max: yMax
              },
              y2axis:{
-                //label:'Verbrauchsabschätzung'
-
+                label:'Verbrauchsabschätzung',
+                labelRenderer: $.jqplot.CanvasAxisLabelRenderer
              }
-           }/*,
+           },
              axesDefaults: {
-                tickRenderer: $.jqplot.CanvasAxisTickRenderer,
+                tickRenderer: $.jqplot.CanvasAxisTickRenderer/*,
                 tickOptions: {
-                    angle: -90
-                }
-             }*/
+                   angle: -90
+                }*/
+             }
         } );
     } );
 
