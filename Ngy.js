@@ -312,7 +312,11 @@
                    color: 'red'
                 }
              ],
-             legend: {show: true,placement: 'outsideGrid'},
+             legend: {
+                show: true,
+                location: 'w',
+                placement: 'insideGrid'
+             },
              highlighter: {
                 show: true,
                 sizeAdjust: 7.5
@@ -343,10 +347,7 @@
              }
            },
              axesDefaults: {
-                tickRenderer: $.jqplot.CanvasAxisTickRenderer/*,
-                tickOptions: {
-                   angle: -90
-                }*/
+                tickRenderer: $.jqplot.CanvasAxisTickRenderer
              }
         } );
     } );

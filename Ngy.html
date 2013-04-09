@@ -43,7 +43,7 @@
    </div>
 
    <div data-role="content">
-      <h2>Neuen Zählerstand erfassen</h2>
+      <h2>Zählerstand erfassen</h2>
       <div data-role="fieldcontain">
          <fieldset data-role="controlgroup">
             <label for="new_date">Datum</label>
@@ -63,7 +63,7 @@
          </fieldset>
       </div>
 
-      <div data-role="navbar" data-iconpos="top">
+      <div data-role="navbar" data-iconpos="top" data-position="fixed">
          <ul>
             <li><a id="save_new_entry" href="#consumption" data-transition="fade" data-theme="" data-icon="save" />Speichern</a></li>
             <li><a href="#all_entries" data-transition="fade" data-theme="" data-icon="bar">Übersicht</a></li>
@@ -78,7 +78,7 @@
       <span class="ui-title">Ngy</span>
    </div>
    <div data-role="content">
-      <h2>Verbrauchsberechnung</h2>
+      <h2>Verbrauch</h2>
       <div class="ui-grid-a">
          <div class="ui-block-a">Tag</div>
          <div id="dayEstimation" class="ui-block-b">12,4 kWh</div>
@@ -88,7 +88,7 @@
          <div id="yearEstimation" class="ui-block-b">4000 kWh</div>
       </div>
 
-      <div data-role="navbar" data-iconpos="top">
+      <div data-role="navbar" data-iconpos="top" data-position="fixed">
          <ul>
             <li><a href="#enter_new_energy_counter" data-transition="fade" data-theme="" data-icon="plus">Neu</a></li>
             <li><a href="#all_entries" data-transition="fade" data-theme="" data-icon="bar">Übersicht</a></li>
@@ -105,11 +105,11 @@
    </div>
 
    <div data-role="content">
-      <h2>Zählerstände</h2>
+      <!-- h2>Zählerstände</h2 -->
       <ul id="entries" data-role="listview" data-divider-theme="b" data-inset="true" data-filter="true"></ul>
    </div>
 
-   <div data-role="navbar" data-iconpos="top">
+   <div data-role="navbar" data-iconpos="top" data-position="fixed">
       <ul>
          <li><a href="#enter_new_energy_counter" data-transition="fade" data-theme="" data-icon="plus">Neu</a></li>
          <li><a href="#graph" data-transition="fade" data-theme="" data-icon="grid">Grafik</a></li>
@@ -145,7 +145,7 @@
          </fieldset>
       </div>
 
-      <div data-role="navbar" data-iconpos="top">
+      <div data-role="navbar" data-iconpos="top" data-position="fixed">
          <ul>
             <li><a href="#all_entries" id="save_entry" data-transition="fade" data-theme="" data-icon="save">Speichern</a></li>
             <li><a href="#all_entries" id="delete_entry" data-transition="fade" data-theme="" data-icon="delete">Löschen</a></li>
@@ -163,11 +163,11 @@
    </div>
 
    <div data-role="content">
-      <h2>Grafik</h2>
-      <div id="chart" style="height:600px; width:400px"></div>
+      <!-- h2>Grafik</h2 -->
+      <div id="chart" style="height:330px; width:315px"></div>
    </div>
 
-   <div data-role="navbar" data-iconpos="top">
+   <div data-role="navbar" data-iconpos="top" data-position="fixed">
       <ul>
          <li><a href="#enter_new_energy_counter" data-transition="fade" data-theme="" data-icon="plus">Neu</a></li>
          <li><a href="#all_entries" data-transition="fade" data-theme="" data-icon="bar">Übersicht</a></li>
