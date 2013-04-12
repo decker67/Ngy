@@ -285,7 +285,9 @@
            }
         }
         //NEEDS FIX B: show no decimals on y axis
-        $('#chart').empty();
+        $( '#chart' ).empty();
+        $( '#chart' ).width( $( document ).width() - 50);
+        $( '#chart' ).height( $( document ).height() - 120 );
         $.jqplot( 'chart',  [ chartCounterValues,
                               chartConsumptionDayValues,
                               chartConsumptionMonthValues,
