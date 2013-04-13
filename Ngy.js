@@ -257,12 +257,18 @@
             chartConsumptionYearValues = [],
             i = null,
             value = null,
+            consumptionDay = null,
+            consumptionYear = null,
             yMin = Number.MAX_VALUE,
             yMax = Number.MIN_VALUE,
+            y2Min = Number.MAX_VALUE,
+            y2Max = Number.MIN_VALUE,
             xMin = null,
             xMax = null,
             date =  null;
             date =  null;
+
+        $( '#chart' ).empty();
 
         if( energyValues.length === 0 ) {
            //NEEDS FIX B: show empty chart
@@ -274,8 +280,12 @@
 
         for( i = 0; i < energyValues.length; ++i ) {
            value = energyValues[ i ].energy_counter;
+           consumptionDay = energyValues[ i ].consumption.day;
+           consumptionYear = energyValues[ i ].consumption.year;
            yMin = Math.min( value, yMin );
            yMax = Math.max( value, yMax );
+           y2Min = Math.min( consumptionDay, y2Min );
+           y2Max = Math.max( consumptionYear, y2Max );
            date = energyValues[ i ].date;
            chartCounterValues.push( [ date, value ] );
            if( i !== 0) {
@@ -285,8 +295,7 @@
            }
         }
         //NEEDS FIX B: show no decimals on y axis
-        $( '#chart' ).empty();
-        $( '#chart' ).width( $( document ).width() - 50);
+        $( '#chart' ).width( $( document ).width() - 10);
         $( '#chart' ).height( $( document ).height() - 120 );
         $.jqplot( 'chart',  [ chartCounterValues,
                               chartConsumptionDayValues,
@@ -345,7 +354,9 @@
              },
              y2axis:{
                 label:'Verbrauchsabschätzung',
-                labelRenderer: $.jqplot.CanvasAxisLabelRenderer
+                labelRenderer: $.jqplot.CanvasAxisLabelRenderer,
+                min: y2Min,
+                max: y2Max
              }
            },
              axesDefaults: {
@@ -364,7 +375,5 @@
         event.stopPropagation();
         saveEntry( '#entry_date', '#entry_time', '#entry_energy_counter', selectedEntryId );
     });
-
-
 
 })( $ );
